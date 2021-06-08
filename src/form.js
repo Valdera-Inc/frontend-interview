@@ -14,6 +14,14 @@ const Form = ({ className }) => {
 
   const submitHandler = (e) => {
     e.preventDefault()
+    const data = {
+      concentration: concentration
+    }
+    db.collection("catalog")
+      .doc(productName)
+      .set(data)
+      .then(() => console.log(`Wrote ${productName}`))
+      .catch(e => console.log(e));
   }
 
   return (

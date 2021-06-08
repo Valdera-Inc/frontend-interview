@@ -5,23 +5,50 @@ import firebase from 'firebase'
 const Form = ({ className }) => {
   const [productName, setProductName] = useState('')
   const [concentration, setConcentration] = useState('')
+  const [concentrationError, setConcentrationError] = useState(null)
 
   const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState([])
 
   const db = firebase.firestore()
-  const storage = firebase.storage()
+
+  const clearForm = () => {
+    setProductName('')
+    setConcentration('')
+  }
+
+  const isValidConcentration = (value) => {
+    return value >= 0 || value.length === 0
+  }
+
+  const changeConcentrationHandler = (e) => {
+    const value = e.target.value
+    setConcentration(value)
+    if (isValidConcentration(value)) {
+      setConcentrationError(null)
+    } else {
+      setConcentrationError('Invalid concentration value')
+    }
+  }
 
   const submitHandler = (e) => {
     e.preventDefault()
+
     const data = {
-      concentration: concentration
+      concentration: concentration,
     }
-    db.collection("catalog")
+    db.collection('catalog')
       .doc(productName)
       .set(data)
-      .then(() => console.log(`Wrote ${productName}`))
-      .catch(e => console.log(e));
+      .then(() => {
+        setIsSuccess(true)
+        clearForm()
+        console.log(`Wrote ${productName}`)
+      })
+      .catch((e) => {
+        setErrors([...errors, e])
+        console.log(e)
+      })
   }
 
   return (
@@ -37,16 +64,21 @@ const Form = ({ className }) => {
       <input
         type='number'
         value={concentration}
-        onChange={(e) => setConcentration(e.target.value)}
+        onChange={changeConcentrationHandler}
       ></input>
-      <button type='submit'>Submit</button>
+      {concentrationError && (
+        <span className='error-text'>{concentrationError}</span>
+      )}
+      <button disabled={concentrationError} type='submit'>
+        Submit
+      </button>
       {isSuccess && <div id='success'>Successfully submitted!</div>}
       {errors.length > 0 && (
         <div id='errors'>
           <h4>Errors</h4>
           <ul>
             {errors.map((error) => (
-              <li>{error}</li>
+              <li>{error.code}</li>
             ))}
           </ul>
         </div>
@@ -56,7 +88,7 @@ const Form = ({ className }) => {
 }
 
 const FormStyled = styled.form`
-  width: 20vw;
+  width: 400px;
   margin: auto;
   padding: 32px;
   padding-top: 16px;
@@ -94,6 +126,10 @@ const FormStyled = styled.form`
     :hover {
       box-shadow: 0px 0px 0px 1px #0b575c;
     }
+  }
+
+  .error-text {
+    color: red;
   }
 
   #success,

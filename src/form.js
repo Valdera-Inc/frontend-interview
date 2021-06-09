@@ -54,21 +54,27 @@ const Form = ({ className }) => {
   return (
     <FormStyled className={className} onSubmit={submitHandler}>
       <h3>Product Catalog</h3>
-      <label>Product Name</label>
-      <input
-        type='text'
-        value={productName}
-        onChange={(e) => setProductName(e.target.value)}
-      ></input>
-      <label>Concentration</label>
-      <input
-        type='number'
-        value={concentration}
-        onChange={changeConcentrationHandler}
-      ></input>
-      {concentrationError && (
-        <span className='error-text'>{concentrationError}</span>
-      )}
+      <div className='inputRow'>
+        <div>
+          <label>Product Name</label>
+          <input
+            type='text'
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+          ></input>
+        </div>
+        <div>
+          <label>Concentration</label>
+          <input
+            type='number'
+            value={concentration}
+            onChange={changeConcentrationHandler}
+          ></input>
+          {concentrationError && (
+            <span className='error-text'>{concentrationError}</span>
+          )}
+        </div>
+      </div>
       <button disabled={concentrationError} type='submit'>
         Submit
       </button>
@@ -128,6 +134,18 @@ const FormStyled = styled.form`
     }
   }
 
+  .inputRow {
+    display: flex;
+
+    > div {
+      flex-grow: 1;
+    }
+
+    > div:first-child {
+      margin-right: 16px;
+    }
+  }
+
   .error-text {
     color: red;
   }
@@ -149,6 +167,16 @@ const FormStyled = styled.form`
 
   #errors {
     border: solid 1px red;
+  }
+
+  @media screen and (max-width: 1000px) {
+    .inputRow {
+      flex-direction: column;
+
+      > div {
+        margin: 0;
+      }
+    }
   }
 `
 
